@@ -14,7 +14,7 @@ const Index = () => {
           <ThemeToggle />
         </div>
         
-        <header className="text-center mb-16">
+        <header className="text-center mb-16 animate-fade-in">
           <h1 className="text-5xl font-bold mb-4">KeyCoin</h1>
           <p className="text-xl text-muted-foreground">
             Your vault for passwords and personal finances by mona darling
@@ -23,7 +23,7 @@ const Index = () => {
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Password Manager Card */}
-          <Card className="glass glass-hover transition-all duration-300">
+          <Card className="glass glass-hover transition-all duration-300 hover:scale-105 hover:shadow-xl animate-fade-in">
             <CardHeader>
               <div className="flex items-center justify-center mb-4">
                 <div className="p-3 rounded-full bg-primary/10">
@@ -42,7 +42,7 @@ const Index = () => {
             </CardContent>
             <CardFooter className="flex justify-center">
               <Link to="/password">
-                <Button size="lg" className="w-full">
+                <Button size="lg" className="w-full transition-all hover:shadow-neon">
                   Open Password Manager
                 </Button>
               </Link>
@@ -50,7 +50,7 @@ const Index = () => {
           </Card>
 
           {/* Finance Tracker Card */}
-          <Card className="glass glass-hover transition-all duration-300">
+          <Card className="glass glass-hover transition-all duration-300 hover:scale-105 hover:shadow-xl animate-fade-in" style={{animationDelay: '100ms'}}>
             <CardHeader>
               <div className="flex items-center justify-center mb-4">
                 <div className="p-3 rounded-full bg-primary/10">
@@ -69,7 +69,7 @@ const Index = () => {
             </CardContent>
             <CardFooter className="flex justify-center">
               <Link to="/finance">
-                <Button size="lg" className="w-full">
+                <Button size="lg" className="w-full transition-all hover:shadow-neon">
                   Open Finance Tracker
                 </Button>
               </Link>
@@ -77,7 +77,7 @@ const Index = () => {
           </Card>
         </div>
 
-        <footer className="mt-16 text-center text-sm text-muted-foreground">
+        <footer className="mt-16 text-center text-sm text-muted-foreground animate-fade-in" style={{animationDelay: '200ms'}}>
           <p>All data is stored locally on your device and never sent to any server.</p>
         </footer>
       </div>

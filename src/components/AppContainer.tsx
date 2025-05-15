@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutGrid, Copy, BarChart3 } from "lucide-react";
+import { LayoutGrid, Copy, BarChart3, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import PasswordGenerator from "./PasswordGenerator";
@@ -17,9 +17,16 @@ const AppContainer: React.FC = () => {
         <p className="text-muted-foreground">Generate, evaluate, and securely store your passwords by mona darling</p>
       </header>
 
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-between mb-4">
+        <Link to="/">
+          <Button variant="ghost" size="sm" className="flex items-center transition-all hover:bg-primary/10">
+            <Home className="mr-2 h-4 w-4" />
+            Home
+          </Button>
+        </Link>
+        
         <Link to="/finance">
-          <Button variant="outline" size="sm" className="flex items-center">
+          <Button variant="outline" size="sm" className="flex items-center hover:shadow-md transition-all">
             <BarChart3 className="mr-2 h-4 w-4" />
             Finance Tracker
           </Button>
@@ -45,11 +52,11 @@ const AppContainer: React.FC = () => {
           </TabsList>
         </div>
 
-        <TabsContent value="generator" className="flex justify-center">
+        <TabsContent value="generator" className="flex justify-center animate-fade-in">
           <PasswordGenerator />
         </TabsContent>
         
-        <TabsContent value="vault">
+        <TabsContent value="vault" className="animate-fade-in">
           <PasswordVault />
         </TabsContent>
       </Tabs>

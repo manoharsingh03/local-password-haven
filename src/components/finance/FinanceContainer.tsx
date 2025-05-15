@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, ListFilter, Lock, Home } from "lucide-react";
+import { BarChart3, ListFilter, Lock, Home, Key } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Dashboard from "./Dashboard";
@@ -15,9 +15,16 @@ const FinanceContainer: React.FC = () => {
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       <div className="flex justify-between items-center mb-4">
         <Link to="/">
-          <Button variant="ghost" size="sm" className="ml-2">
+          <Button variant="ghost" size="sm" className="flex items-center transition-all hover:bg-primary/10">
             <Home className="h-4 w-4 mr-2" />
-            Back to Password Manager
+            Back to Home
+          </Button>
+        </Link>
+        
+        <Link to="/password">
+          <Button variant="outline" size="sm" className="flex items-center hover:shadow-md transition-all">
+            <Key className="h-4 w-4 mr-2" />
+            Password Manager
           </Button>
         </Link>
       </div>
