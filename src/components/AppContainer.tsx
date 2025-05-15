@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutGrid, Copy } from "lucide-react";
+import { LayoutGrid, Copy, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import PasswordGenerator from "./PasswordGenerator";
 import PasswordVault from "./PasswordVault";
 
@@ -15,6 +16,15 @@ const AppContainer: React.FC = () => {
         <h1 className="text-4xl font-bold mb-2">Password Manager</h1>
         <p className="text-muted-foreground">Generate, evaluate, and securely store your passwords by mona darling</p>
       </header>
+
+      <div className="flex justify-end mb-4">
+        <Link to="/finance">
+          <Button variant="outline" size="sm" className="flex items-center">
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Finance Tracker
+          </Button>
+        </Link>
+      </div>
 
       <Tabs 
         defaultValue="generator" 
