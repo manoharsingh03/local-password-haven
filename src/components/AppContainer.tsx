@@ -13,7 +13,7 @@ const AppContainer: React.FC = () => {
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       <header className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">Password Manager</h1>
-        <p className="text-muted-foreground">Generate, evaluate, and securely store your passwords</p>
+        <p className="text-muted-foreground">Generate, evaluate, and securely store your passwords by mona darling</p>
       </header>
 
       <Tabs 
