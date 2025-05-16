@@ -22,7 +22,7 @@ const FinanceContainer: React.FC = () => {
         </Link>
         
         <Link to="/password">
-          <Button variant="outline" size="sm" className="flex items-center hover:shadow-md transition-all">
+          <Button variant="outline" size="sm" className="flex items-center hover:shadow-md transition-all animate-pulse-slow">
             <Key className="h-4 w-4 mr-2" />
             Password Manager
           </Button>

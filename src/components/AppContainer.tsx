@@ -26,7 +26,7 @@ const AppContainer: React.FC = () => {
         </Link>
         
         <Link to="/finance">
-          <Button variant="outline" size="sm" className="flex items-center hover:shadow-md transition-all">
+          <Button variant="outline" size="sm" className="flex items-center hover:shadow-md transition-all animate-pulse-slow">
             <BarChart3 className="mr-2 h-4 w-4" />
             Finance Tracker
           </Button>

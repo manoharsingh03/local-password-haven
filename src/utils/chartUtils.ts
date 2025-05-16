@@ -1,5 +1,5 @@
 
-import { Transaction, Category, TransactionType } from './financeUtils';
+import { Transaction } from './financeUtils';
 
 // Helper function to get month name from date string
 export const getMonthName = (dateStr: string): string => {
@@ -52,19 +52,22 @@ export const prepareMonthlyChartData = (transactions: Transaction[]) => {
 };
 
 // Prepare data for category spending chart
-export const prepareCategoryChartData = (transactions: Transaction[], categories: Category[]) => {
+export const prepareCategoryChartData = (transactions: Transaction[], type: 'income' | 'expense') => {
   const expensesByCategory: Record<string, number> = {};
   
+  // Get all unique categories
+  const categories = Array.from(new Set(transactions
+    .filter(t => t.type === type)
+    .map(t => t.category)));
+    
   // Initialize all categories with zero
   categories.forEach((category) => {
-    if (category.type === 'expense') {
-      expensesByCategory[category.name] = 0;
-    }
+    expensesByCategory[category] = 0;
   });
   
   // Aggregate expense transactions by category
   transactions.forEach((transaction) => {
-    if (transaction.type === 'expense' && expensesByCategory[transaction.category] !== undefined) {
+    if (transaction.type === type && expensesByCategory[transaction.category] !== undefined) {
       expensesByCategory[transaction.category] += transaction.amount;
     }
   });

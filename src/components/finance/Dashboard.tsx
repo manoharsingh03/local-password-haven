@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, TrendingDown, DollarSign } from "lucide-react";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell } from 'recharts';
 import TransactionForm from './TransactionForm';
 import { Button } from '@/components/ui/button';
@@ -148,10 +147,10 @@ const Dashboard: React.FC = () => {
               <BarChart data={monthlyData}>
                 <XAxis dataKey="month" />
                 <YAxis />
-                <ChartTooltip 
-                  content={(props) => 
-                    <ChartTooltipContent {...props} />
-                  }
+                <Tooltip 
+                  content={(props) => (
+                    <ChartTooltip {...props} />
+                  )}
                 />
                 <Bar dataKey="income" fill="var(--color-income)" name="Income" />
                 <Bar dataKey="expense" fill="var(--color-expense)" name="Expense" />

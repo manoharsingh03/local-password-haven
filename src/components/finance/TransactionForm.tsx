@@ -1,10 +1,8 @@
-
 import React from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -58,7 +56,11 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSubmit
   const handleSubmit = (values: z.infer<typeof transactionSchema>) => {
     const newTransaction: Transaction = {
       id: transaction?.id || crypto.randomUUID(),
-      ...values,
+      amount: values.amount,
+      type: values.type,
+      category: values.category,
+      description: values.description,
+      date: values.date,
     };
     onSubmit(newTransaction);
   };
