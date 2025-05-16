@@ -34,9 +34,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      setSession(newSession);
+      setUser(newSession?.user || null);
+      setLoading(false);
+    });
+
+    // THEN check for existing session
     const getSession = async () => {
-      setLoading(true);
       try {
         const { data: { session: initialSession }, error } = await supabase.auth.getSession();
         
@@ -52,13 +58,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setLoading(false);
       }
     };
-
-    // Setup auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      setUser(newSession?.user || null);
-      setLoading(false);
-    });
 
     getSession();
 
@@ -106,9 +105,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           redirectTo: `${window.location.origin}/auth/callback`,
         }
       });
+      
+      console.log("Google auth initiated:", response);
+      
+      if (response.error) {
+        toast({
+          title: "Google login failed",
+          description: response.error.message,
+          variant: "destructive"
+        });
+      }
+      
       return response;
     } catch (error) {
       console.error('Google sign in error:', error);
+      toast({
+        title: "Google login failed",
+        description: "Could not connect to Google. Please try again.",
+        variant: "destructive"
+      });
       throw error;
     }
   };

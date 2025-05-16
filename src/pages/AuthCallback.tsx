@@ -1,7 +1,7 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { toast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
 
@@ -12,11 +12,10 @@ const AuthCallback = () => {
     // Handle the OAuth callback
     const handleAuthCallback = async () => {
       try {
-        const { error } = await supabase.auth.getSession();
+        console.log("Auth callback initiated");
         
-        // Redirect to home page regardless of the result
-        // The AuthContext will handle showing proper state
-        navigate('/', { replace: true });
+        // Get the session from the URL
+        const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Error during auth callback:', error);
@@ -25,20 +24,29 @@ const AuthCallback = () => {
             description: error.message || "There was a problem logging you in",
             variant: "destructive"
           });
-        } else {
+          navigate('/', { replace: true });
+          return;
+        }
+        
+        console.log("Auth session retrieved:", data);
+        
+        if (data?.session) {
           toast({
             title: "Login Successful",
             description: "You have been successfully logged in."
           });
         }
+        
+        // Redirect to home page
+        navigate('/', { replace: true });
       } catch (err) {
         console.error("Auth callback error:", err);
-        navigate('/', { replace: true });
         toast({
           title: "Authentication Error",
           description: "There was a problem processing your login",
           variant: "destructive"
         });
+        navigate('/', { replace: true });
       }
     };
 

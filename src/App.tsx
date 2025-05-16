@@ -11,6 +11,7 @@ import FinanceTracker from "./pages/FinanceTracker";
 import PasswordManager from "./pages/PasswordManager";
 import Login from "./pages/Login";
 import AuthCallback from "./pages/AuthCallback";
+import UserProfile from "./pages/UserProfile";
 
 // Protected route wrapper
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -32,6 +33,7 @@ const AppRoutes = () => (
     <Route path="/finance" element={<FinanceTracker />} />
     <Route path="/password" element={<PasswordManager />} />
     <Route path="/login" element={<Login />} />
+    <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
     <Route path="/auth/callback" element={<AuthCallback />} />
     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
     <Route path="*" element={<NotFound />} />

@@ -4,13 +4,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from '@/components/ThemeToggle';
-import { Key, Wallet, LogIn, LogOut } from 'lucide-react';
+import { Key, Wallet, LogIn, LogOut, User } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import ProfileCard from '@/components/ProfileCard';
 
 const Index = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, signOut } = useAuth();
+  const { isLoggedIn, user, signOut } = useAuth();
 
   const handleLogout = async () => {
     await signOut();
@@ -21,32 +20,46 @@ const Index = () => {
     navigate('/login');
   };
 
+  // Get user display name (full name or email)
+  const userDisplayName = isLoggedIn 
+    ? user?.user_metadata?.full_name || user?.email || 'User'
+    : '';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       <div className="container mx-auto px-4 py-12 max-w-5xl">
-        <div className="flex justify-end mb-2">
-          <ThemeToggle />
-        </div>
-        
-        <header className="text-center mb-16 animate-fade-in">
-          <h1 className="text-5xl font-bold mb-4">KeyCoin</h1>
-          <p className="text-xl text-muted-foreground">
-            Your vault for passwords and personal finances
-          </p>
-          
-          {isLoggedIn ? (
-            <div className="mt-6 max-w-md mx-auto">
-              <ProfileCard />
-            </div>
-          ) : (
-            <div className="mt-6">
+        {/* Header with auth controls */}
+        <header className="flex items-center justify-between mb-8">
+          <h2 className="text-2xl font-bold">KeyCoin</h2>
+          <div className="flex items-center gap-4">
+            {isLoggedIn ? (
+              <div className="flex items-center gap-3">
+                <Link to="/profile">
+                  <Button variant="outline" className="flex items-center gap-2">
+                    <User className="h-4 w-4" />
+                    {userDisplayName.split(' ')[0]}
+                  </Button>
+                </Link>
+                <Button variant="ghost" onClick={handleLogout} size="icon">
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
               <Button onClick={handleLogin} className="animate-fade-in">
                 <LogIn className="mr-2 h-4 w-4" />
                 Login
               </Button>
-            </div>
-          )}
+            )}
+            <ThemeToggle />
+          </div>
         </header>
+        
+        <div className="text-center mb-16 animate-fade-in">
+          <h1 className="text-5xl font-bold mb-4">KeyCoin</h1>
+          <p className="text-xl text-muted-foreground">
+            Your vault for passwords and personal finances
+          </p>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-8">
           {/* Password Manager Card */}

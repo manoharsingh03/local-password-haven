@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, TrendingDown, IndianRupee } from "lucide-react";
@@ -74,10 +73,9 @@ const customTooltip = ({ active, payload, label }: any) => {
 };
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [showAddTransaction, setShowAddTransaction] = useState(false);
-  const [loadedData, setLoadedData] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -94,37 +92,27 @@ const Dashboard: React.FC = () => {
             
           if (error) {
             console.error('Error fetching transactions:', error);
-            // Fall back to demo data
-            if (!loadedData) {
-              setTransactions(DEMO_TRANSACTIONS);
-              setLoadedData(true);
-            }
+            setTransactions([]);
           } else if (data.length > 0) {
             setTransactions(data);
-            setLoadedData(true);
-          } else if (!loadedData) {
-            // If no data in Supabase yet, use demo data
-            setTransactions(DEMO_TRANSACTIONS);
-            setLoadedData(true);
+          } else {
+            // If no data in Supabase yet for logged in user, initialize with empty array
+            setTransactions([]);
           }
         } catch (error) {
           console.error('Error fetching transactions:', error);
-          if (!loadedData) {
-            setTransactions(DEMO_TRANSACTIONS);
-            setLoadedData(true);
-          }
+          setTransactions([]);
         }
-      } else if (!loadedData) {
+      } else {
         // For non-logged in users, use demo data
-        setTransactions(DEMO_TRANSACTIONS);
-        setLoadedData(true);
+        setTransactions([]);
       }
       
       setIsLoading(false);
     };
 
     fetchTransactions();
-  }, [user, loadedData]);
+  }, [user]);
 
   const monthlyData = getMonthlyData(transactions);
   const expenseCategoryData = getCategoryTotals(transactions, 'expense');
