@@ -4,17 +4,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from '@/components/ThemeToggle';
-import { Key, Wallet, LogIn, LogOut, User } from 'lucide-react';
+import { Key, Wallet, LogIn, User } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Index = () => {
   const navigate = useNavigate();
-  const { isLoggedIn, user, signOut } = useAuth();
-
-  const handleLogout = async () => {
-    await signOut();
-    navigate('/');
-  };
+  const { isLoggedIn, user } = useAuth();
 
   const handleLogin = () => {
     navigate('/login');
@@ -24,6 +20,9 @@ const Index = () => {
   const userDisplayName = isLoggedIn 
     ? user?.user_metadata?.full_name || user?.email || 'User'
     : '';
+    
+  // First letter of name or email for avatar fallback
+  const fallbackText = userDisplayName ? userDisplayName.charAt(0).toUpperCase() : 'U';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
@@ -31,21 +30,19 @@ const Index = () => {
         {/* Header with auth controls */}
         <header className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold">KeyCoin</h2>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
-                <Link to="/profile">
-                  <Button variant="outline" className="flex items-center gap-2">
-                    <User className="h-4 w-4" />
-                    {userDisplayName.split(' ')[0]}
-                  </Button>
+                <Link to="/profile" className="flex items-center gap-2 hover:bg-secondary/50 px-3 py-1.5 rounded-full transition-all">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user?.user_metadata?.avatar_url || ''} />
+                    <AvatarFallback>{fallbackText}</AvatarFallback>
+                  </Avatar>
+                  <span className="hidden sm:inline font-medium">{userDisplayName.split(' ')[0]}</span>
                 </Link>
-                <Button variant="ghost" onClick={handleLogout} size="icon">
-                  <LogOut className="h-4 w-4" />
-                </Button>
               </div>
             ) : (
-              <Button onClick={handleLogin} className="animate-fade-in">
+              <Button onClick={handleLogin} size="sm" className="animate-fade-in">
                 <LogIn className="mr-2 h-4 w-4" />
                 Login
               </Button>

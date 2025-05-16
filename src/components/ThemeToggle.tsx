@@ -5,6 +5,8 @@ import { Moon, Sun } from "lucide-react";
 
 const ThemeToggle = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    if (typeof window === 'undefined') return 'light';
+    
     // Check for saved theme in localStorage
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark' || savedTheme === 'light') {
@@ -38,6 +40,7 @@ const ThemeToggle = () => {
       size="icon"
       onClick={toggleTheme}
       aria-label="Toggle theme"
+      className="rounded-full"
     >
       {theme === 'light' ? (
         <Moon className="h-5 w-5" />

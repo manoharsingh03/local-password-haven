@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart3, TrendingUp, TrendingDown, IndianRupee } from "lucide-react";
-import { ChartContainer, ChartTooltip } from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, PieChart, Pie, Cell, Legend } from 'recharts';
 import TransactionForm from './TransactionForm';
 import { Button } from '@/components/ui/button';
@@ -9,42 +9,6 @@ import { Transaction, CategoryTotal, getMonthlyData, getCategoryTotals, calculat
 import { formatCurrency } from '@/utils/formatUtils';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-
-// Demo data for initial render
-const DEMO_TRANSACTIONS: Transaction[] = [
-  {
-    id: '1',
-    amount: 25000,
-    type: 'income',
-    category: 'Salary',
-    description: 'Monthly salary',
-    date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: '2',
-    amount: 12500,
-    type: 'expense',
-    category: 'Housing',
-    description: 'Rent payment',
-    date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: '3',
-    amount: 1200,
-    type: 'expense',
-    category: 'Food',
-    description: 'Grocery shopping',
-    date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    id: '4',
-    amount: 5000,
-    type: 'income',
-    category: 'Freelance',
-    description: 'Side project',
-    date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-];
 
 // Chart colors
 const EXPENSE_COLORS = [
@@ -93,7 +57,7 @@ const Dashboard: React.FC = () => {
           if (error) {
             console.error('Error fetching transactions:', error);
             setTransactions([]);
-          } else if (data.length > 0) {
+          } else if (data && data.length > 0) {
             setTransactions(data);
           } else {
             // If no data in Supabase yet for logged in user, initialize with empty array
@@ -104,7 +68,7 @@ const Dashboard: React.FC = () => {
           setTransactions([]);
         }
       } else {
-        // For non-logged in users, use demo data
+        // For non-logged in users, initialize with empty array
         setTransactions([]);
       }
       
@@ -138,6 +102,7 @@ const Dashboard: React.FC = () => {
         if (error) throw error;
       } catch (error) {
         console.error('Error adding transaction:', error);
+        return;
       }
     }
     

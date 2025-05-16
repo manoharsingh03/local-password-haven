@@ -14,17 +14,32 @@ const AuthCallback = () => {
       try {
         console.log("Auth callback initiated");
         
-        // Get the session from the URL
-        const { data, error } = await supabase.auth.getSession();
+        // Get the auth parameters from the URL
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const error = hashParams.get('error');
         
         if (error) {
-          console.error('Error during auth callback:', error);
+          console.error('Auth error from provider:', error);
           toast({
             title: "Authentication Error",
-            description: error.message || "There was a problem logging you in",
+            description: error || "There was a problem logging you in",
             variant: "destructive"
           });
-          navigate('/', { replace: true });
+          navigate('/login', { replace: true });
+          return;
+        }
+        
+        // Get the session
+        const { data, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Error during auth callback:', sessionError);
+          toast({
+            title: "Authentication Error",
+            description: sessionError.message || "There was a problem logging you in",
+            variant: "destructive"
+          });
+          navigate('/login', { replace: true });
           return;
         }
         
@@ -35,10 +50,18 @@ const AuthCallback = () => {
             title: "Login Successful",
             description: "You have been successfully logged in."
           });
+          // Redirect to home page
+          navigate('/', { replace: true });
+        } else {
+          // If no session, something went wrong
+          console.error("No session found after auth callback");
+          toast({
+            title: "Authentication Error",
+            description: "Failed to create a session. Please try again.",
+            variant: "destructive"
+          });
+          navigate('/login', { replace: true });
         }
-        
-        // Redirect to home page
-        navigate('/', { replace: true });
       } catch (err) {
         console.error("Auth callback error:", err);
         toast({
@@ -46,7 +69,7 @@ const AuthCallback = () => {
           description: "There was a problem processing your login",
           variant: "destructive"
         });
-        navigate('/', { replace: true });
+        navigate('/login', { replace: true });
       }
     };
 

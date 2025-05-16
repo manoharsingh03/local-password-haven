@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { toast } from '@/components/ui/use-toast';
 import ThemeToggle from '@/components/ThemeToggle';
 import { format } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 const UserProfile = () => {
   const { user, signOut } = useAuth();
@@ -50,10 +51,12 @@ const UserProfile = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-muted p-4">
       <div className="container mx-auto max-w-4xl">
         <div className="flex justify-between items-center mb-8">
-          <Button variant="ghost" onClick={() => navigate(-1)} className="flex items-center gap-2">
-            <ArrowLeft size={16} />
-            Back
-          </Button>
+          <Link to="/">
+            <Button variant="ghost" className="flex items-center gap-2">
+              <ArrowLeft size={16} />
+              Back to Home
+            </Button>
+          </Link>
           <ThemeToggle />
         </div>
         
@@ -123,6 +126,23 @@ const UserProfile = () => {
             </Button>
           </CardFooter>
         </Card>
+        
+        <div className="mt-8 space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl">Application Settings</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">Theme</p>
+                  <p className="text-sm text-muted-foreground">Change between light and dark mode</p>
+                </div>
+                <ThemeToggle />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
