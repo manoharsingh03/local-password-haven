@@ -1,7 +1,7 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
-import { Session, User, AuthResponse } from '@supabase/supabase-js';
+import { AuthError, Session, User, AuthResponse, OAuthResponse } from '@supabase/supabase-js';
 import { toast } from '@/components/ui/use-toast';
 
 interface AuthContextType {
@@ -9,7 +9,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<AuthResponse>;
-  signInWithGoogle: () => Promise<AuthResponse>;
+  signInWithGoogle: () => Promise<OAuthResponse>; // Updated to OAuthResponse type
   signUp: (email: string, password: string) => Promise<AuthResponse>;
   signOut: () => Promise<void>;
   isLoggedIn: boolean;
@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   signIn: async () => ({} as AuthResponse),
-  signInWithGoogle: async () => ({} as AuthResponse),
+  signInWithGoogle: async () => ({} as OAuthResponse), // Updated to OAuthResponse type
   signUp: async () => ({} as AuthResponse),
   signOut: async () => {},
   isLoggedIn: false,
