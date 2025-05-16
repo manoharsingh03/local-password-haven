@@ -1,6 +1,6 @@
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { AuthError, Session, User, AuthResponse, OAuthResponse } from '@supabase/supabase-js';
 import { toast } from '@/components/ui/use-toast';
 
@@ -9,7 +9,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<AuthResponse>;
-  signInWithGoogle: () => Promise<OAuthResponse>; // Updated to OAuthResponse type
+  signInWithGoogle: () => Promise<OAuthResponse>;
   signUp: (email: string, password: string) => Promise<AuthResponse>;
   signOut: () => Promise<void>;
   isLoggedIn: boolean;
@@ -21,7 +21,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   signIn: async () => ({} as AuthResponse),
-  signInWithGoogle: async () => ({} as OAuthResponse), // Updated to OAuthResponse type
+  signInWithGoogle: async () => ({} as OAuthResponse),
   signUp: async () => ({} as AuthResponse),
   signOut: async () => {},
   isLoggedIn: false,
@@ -37,15 +37,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Get initial session
     const getSession = async () => {
       setLoading(true);
-      const { data: { session: initialSession }, error } = await supabase.auth.getSession();
-      
-      if (error) {
-        console.error('Error fetching session:', error);
+      try {
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error fetching session:', error);
+        }
+        
+        setSession(initialSession);
+        setUser(initialSession?.user || null);
+      } catch (error) {
+        console.error('Session fetch error:', error);
+      } finally {
+        setLoading(false);
       }
-      
-      setSession(initialSession);
-      setUser(initialSession?.user || null);
-      setLoading(false);
     };
 
     // Setup auth state listener
@@ -82,6 +87,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return response;
     } catch (error) {
       console.error('Sign in error:', error);
+      const authError = error as AuthError;
+      toast({
+        title: "Login error",
+        description: authError.message || "An unexpected error occurred",
+        variant: "destructive"
+      });
       throw error;
     }
   };
@@ -105,7 +116,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Sign up with email and password
   const signUp = async (email: string, password: string) => {
     try {
-      const response = await supabase.auth.signUp({ email, password });
+      const response = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        } 
+      });
+      
       if (response.error) {
         toast({
           title: "Signup failed",
