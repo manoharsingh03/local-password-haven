@@ -1,12 +1,26 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from '@/components/ThemeToggle';
-import { Key, Wallet } from 'lucide-react';
+import { Key, Wallet, LogIn, LogOut } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import ProfileCard from '@/components/ProfileCard';
 
 const Index = () => {
+  const navigate = useNavigate();
+  const { isLoggedIn, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       <div className="container mx-auto px-4 py-12 max-w-5xl">
@@ -17,8 +31,21 @@ const Index = () => {
         <header className="text-center mb-16 animate-fade-in">
           <h1 className="text-5xl font-bold mb-4">KeyCoin</h1>
           <p className="text-xl text-muted-foreground">
-            Your vault for passwords and personal finances by mona darling
+            Your vault for passwords and personal finances
           </p>
+          
+          {isLoggedIn ? (
+            <div className="mt-6 max-w-md mx-auto">
+              <ProfileCard />
+            </div>
+          ) : (
+            <div className="mt-6">
+              <Button onClick={handleLogin} className="animate-fade-in">
+                <LogIn className="mr-2 h-4 w-4" />
+                Login
+              </Button>
+            </div>
+          )}
         </header>
 
         <div className="grid md:grid-cols-2 gap-8">
@@ -78,7 +105,7 @@ const Index = () => {
         </div>
 
         <footer className="mt-16 text-center text-sm text-muted-foreground animate-fade-in" style={{animationDelay: '200ms'}}>
-          <p>All data is stored locally on your device and never sent to any server.</p>
+          <p>All data is stored {isLoggedIn ? 'in your encrypted Supabase account' : 'locally on your device and never sent to any server'}.</p>
         </footer>
       </div>
     </div>

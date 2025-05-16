@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -21,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DEFAULT_INCOME_CATEGORIES, DEFAULT_EXPENSE_CATEGORIES, Transaction } from "@/utils/financeUtils";
+import { IndianRupee } from "lucide-react";
 
 const transactionSchema = z.object({
   amount: z.coerce.number().positive("Amount must be greater than 0"),
@@ -74,9 +76,12 @@ const TransactionForm: React.FC<TransactionFormProps> = ({ transaction, onSubmit
             name="amount"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Amount ($)</FormLabel>
+                <FormLabel>Amount (₹)</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                  <div className="relative">
+                    <IndianRupee className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input type="number" step="0.01" placeholder="0.00" className="pl-10" {...field} />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

@@ -1,15 +1,18 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BarChart3, ListFilter, Lock, Home, Key } from "lucide-react";
+import { BarChart3, ListFilter, Lock, Home, Key, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import TransactionList from "./TransactionList";
 import FinanceVault from "./FinanceVault";
+import ProfileCard from "../ProfileCard";
+import { useAuth } from '@/context/AuthContext';
 
 const FinanceContainer: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("dashboard");
+  const { isLoggedIn } = useAuth();
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -33,6 +36,12 @@ const FinanceContainer: React.FC = () => {
         <h1 className="text-4xl font-bold mb-2">Finance Tracker</h1>
         <p className="text-muted-foreground">Track, visualize, and manage your personal finances</p>
       </header>
+
+      {isLoggedIn && (
+        <div className="mb-6">
+          <ProfileCard />
+        </div>
+      )}
 
       <Tabs 
         defaultValue="dashboard" 
@@ -71,7 +80,7 @@ const FinanceContainer: React.FC = () => {
       </Tabs>
 
       <footer className="mt-10 text-center text-sm text-muted-foreground">
-        <p>Your financial data never leaves this device. All data is stored locally and can be encrypted.</p>
+        <p>Your financial data {isLoggedIn ? 'is' : 'never leaves this device. All data is stored locally and'} can be encrypted.</p>
       </footer>
     </div>
   );

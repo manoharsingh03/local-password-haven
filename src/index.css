@@ -5,67 +5,48 @@
 
 @layer base {
   :root {
-    --background: 230 60% 98%;
-    --foreground: 240 10% 3.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 240 10% 3.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 3.9%;
-
-    --primary: 250 95% 60%;
-    --primary-rgb: 95, 60, 240;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 240 4.8% 95.9%;
-    --secondary-foreground: 240 5.9% 10%;
-
-    --muted: 240 4.8% 95.9%;
-    --muted-foreground: 240 3.8% 46.1%;
-
-    --accent: 240 4.8% 95.9%;
-    --accent-foreground: 240 5.9% 10%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 240 5.9% 90%;
-    --input: 240 5.9% 90%;
-    --ring: 250 95% 60%;
-
-    --radius: 0.8rem;
-  }
-
-  .dark {
-    --background: 240 10% 4%;
-    --foreground: 0 0% 95%;
-
-    --card: 240 10% 8%;
-    --card-foreground: 0 0% 95%;
-
-    --popover: 240 10% 8%;
-    --popover-foreground: 0 0% 95%;
-
-    --primary: 250 95% 65%;
-    --primary-rgb: 124, 93, 250;
-    --primary-foreground: 0 0% 98%;
-
-    --secondary: 240 4% 16%;
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
-
-    --muted: 240 4% 16%;
-    --muted-foreground: 240 5% 65%;
-
-    --accent: 240 4% 16%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
     --accent-foreground: 0 0% 98%;
-
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-
-    --border: 240 4% 25%;
-    --input: 240 4% 25%;
-    --ring: 250 95% 65%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --radius: 0.5rem;
+  }
+ 
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
   }
 }
 
@@ -73,7 +54,6 @@
   * {
     @apply border-border;
   }
-  
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
@@ -82,14 +62,39 @@
 
 @layer components {
   .glass {
-    @apply bg-white/30 dark:bg-black/30 backdrop-blur-md border border-white/30 dark:border-white/10 shadow-glass;
+    @apply bg-background/40 backdrop-blur-lg border border-white/10 shadow-lg;
   }
   
   .glass-hover {
-    @apply hover:shadow-glass-hover hover:bg-white/40 dark:hover:bg-black/40 transition-all duration-300;
+    @apply transition-all hover:bg-background/60;
+  }
+}
+
+@layer utilities {
+  /* These are for the color variables used in the charts */
+  :root {
+    --color-income: #36A2EB;
+    --color-expense: #FF6384;
   }
   
-  .password-input {
-    @apply font-mono tracking-wider;
+  .hover-scale {
+    @apply transition-transform duration-200 hover:scale-105;
   }
+  
+  .hover-shadow-neon {
+    @apply hover:shadow-[0_0_15px_rgba(255,255,255,0.3)];
+  }
+}
+
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

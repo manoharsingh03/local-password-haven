@@ -1,20 +1,23 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutGrid, Copy, BarChart3, Home } from "lucide-react";
+import { LayoutGrid, Copy, BarChart3, Home, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import PasswordGenerator from "./PasswordGenerator";
 import PasswordVault from "./PasswordVault";
+import ProfileCard from "./ProfileCard";
+import { useAuth } from '@/context/AuthContext';
 
 const AppContainer: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>("generator");
+  const { isLoggedIn } = useAuth();
 
   return (
     <div className="container mx-auto px-4 py-6 max-w-4xl">
       <header className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2">Password Manager</h1>
-        <p className="text-muted-foreground">Generate, evaluate, and securely store your passwords by mona darling</p>
+        <p className="text-muted-foreground">Generate, evaluate, and securely store your passwords</p>
       </header>
 
       <div className="flex justify-between mb-4">
@@ -32,6 +35,12 @@ const AppContainer: React.FC = () => {
           </Button>
         </Link>
       </div>
+
+      {isLoggedIn && (
+        <div className="mb-6">
+          <ProfileCard />
+        </div>
+      )}
 
       <Tabs 
         defaultValue="generator" 
@@ -62,7 +71,7 @@ const AppContainer: React.FC = () => {
       </Tabs>
 
       <footer className="mt-10 text-center text-sm text-muted-foreground">
-        <p>Your passwords never leave this device. All data is encrypted and stored locally.</p>
+        <p>Your passwords {isLoggedIn ? 'are' : 'never leave this device. All data is encrypted and stored locally'}.</p>
       </footer>
     </div>
   );

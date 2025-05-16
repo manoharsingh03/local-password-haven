@@ -5,16 +5,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Pencil, Trash2, Download, FileJson, FileText } from "lucide-react";
+import { Pencil, Trash2, Download, FileJson, FileText, IndianRupee } from "lucide-react";
 import TransactionForm from './TransactionForm';
 import { Transaction, exportTransactionsAsCSV, exportTransactionsAsJSON } from '@/utils/financeUtils';
 import { toast } from "@/components/ui/use-toast";
+import { formatCurrency, formatDate } from '@/utils/formatUtils';
+import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 
 // Using the same demo data for initial render
 const DEMO_TRANSACTIONS: Transaction[] = [
   {
     id: '1',
-    amount: 2500,
+    amount: 25000,
     type: 'income',
     category: 'Salary',
     description: 'Monthly salary',
@@ -22,7 +25,7 @@ const DEMO_TRANSACTIONS: Transaction[] = [
   },
   {
     id: '2',
-    amount: 500,
+    amount: 12500,
     type: 'expense',
     category: 'Housing',
     description: 'Rent payment',
@@ -30,7 +33,7 @@ const DEMO_TRANSACTIONS: Transaction[] = [
   },
   {
     id: '3',
-    amount: 120,
+    amount: 1200,
     type: 'expense',
     category: 'Food',
     description: 'Grocery shopping',
@@ -38,7 +41,7 @@ const DEMO_TRANSACTIONS: Transaction[] = [
   },
   {
     id: '4',
-    amount: 200,
+    amount: 5000,
     type: 'income',
     category: 'Freelance',
     description: 'Side project',
@@ -47,20 +50,60 @@ const DEMO_TRANSACTIONS: Transaction[] = [
 ];
 
 const TransactionList: React.FC = () => {
-  // In a real app, this would be loaded from storage
+  const { user } = useAuth();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [showAddTransaction, setShowAddTransaction] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [loadedData, setLoadedData] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
-    // For demo purposes, we'll use this sample data
-    if (!loadedData) {
-      setTransactions(DEMO_TRANSACTIONS);
-      setLoadedData(true);
-    }
-  }, [loadedData]);
+    const fetchTransactions = async () => {
+      setIsLoading(true);
+      
+      // If user is logged in, fetch from Supabase
+      if (user) {
+        try {
+          const { data, error } = await supabase
+            .from('transactions')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('date', { ascending: false });
+            
+          if (error) {
+            console.error('Error fetching transactions:', error);
+            // Fall back to demo data
+            if (!loadedData) {
+              setTransactions(DEMO_TRANSACTIONS);
+              setLoadedData(true);
+            }
+          } else if (data.length > 0) {
+            setTransactions(data);
+            setLoadedData(true);
+          } else if (!loadedData) {
+            // If no data in Supabase yet, use demo data
+            setTransactions(DEMO_TRANSACTIONS);
+            setLoadedData(true);
+          }
+        } catch (error) {
+          console.error('Error fetching transactions:', error);
+          if (!loadedData) {
+            setTransactions(DEMO_TRANSACTIONS);
+            setLoadedData(true);
+          }
+        }
+      } else if (!loadedData) {
+        // For non-logged in users, use demo data
+        setTransactions(DEMO_TRANSACTIONS);
+        setLoadedData(true);
+      }
+      
+      setIsLoading(false);
+    };
+
+    fetchTransactions();
+  }, [user, loadedData]);
   
   // Filter transactions based on search term
   const filteredTransactions = transactions.filter(t => 
@@ -73,7 +116,31 @@ const TransactionList: React.FC = () => {
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
   
-  const handleAddTransaction = (newTransaction: Transaction) => {
+  const handleAddTransaction = async (newTransaction: Transaction) => {
+    // Add user_id if logged in
+    const transactionToAdd = user 
+      ? { ...newTransaction, user_id: user.id } 
+      : newTransaction;
+    
+    // If user is logged in, add to Supabase
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('transactions')
+          .insert([transactionToAdd]);
+          
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error adding transaction:', error);
+        toast({
+          title: "Error",
+          description: "Failed to add transaction to database.",
+          variant: "destructive",
+        });
+      }
+    }
+    
+    // Update local state
     setTransactions([...transactions, newTransaction]);
     setShowAddTransaction(false);
     toast({
@@ -82,7 +149,27 @@ const TransactionList: React.FC = () => {
     });
   };
   
-  const handleUpdateTransaction = (updatedTransaction: Transaction) => {
+  const handleUpdateTransaction = async (updatedTransaction: Transaction) => {
+    // If user is logged in, update in Supabase
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('transactions')
+          .update(updatedTransaction)
+          .eq('id', updatedTransaction.id);
+          
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error updating transaction:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update transaction in database.",
+          variant: "destructive",
+        });
+      }
+    }
+    
+    // Update local state
     setTransactions(
       transactions.map(t => t.id === updatedTransaction.id ? updatedTransaction : t)
     );
@@ -93,7 +180,27 @@ const TransactionList: React.FC = () => {
     });
   };
   
-  const handleDeleteTransaction = (id: string) => {
+  const handleDeleteTransaction = async (id: string) => {
+    // If user is logged in, delete from Supabase
+    if (user) {
+      try {
+        const { error } = await supabase
+          .from('transactions')
+          .delete()
+          .eq('id', id);
+          
+        if (error) throw error;
+      } catch (error) {
+        console.error('Error deleting transaction:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete transaction from database.",
+          variant: "destructive",
+        });
+      }
+    }
+    
+    // Update local state
     setTransactions(transactions.filter(t => t.id !== id));
     toast({
       title: "Transaction deleted",
@@ -139,18 +246,13 @@ const TransactionList: React.FC = () => {
       });
     }
   };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-  };
   
   return (
     <div className="space-y-6 animate-fade-in">
       <Card>
         <CardHeader className="flex flex-row justify-between items-center">
           <CardTitle>All Transactions</CardTitle>
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button 
               variant="outline" 
               size="sm" 
@@ -182,7 +284,7 @@ const TransactionList: React.FC = () => {
             />
           </div>
           
-          <div className="rounded-md border">
+          <div className="rounded-md border overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -195,48 +297,55 @@ const TransactionList: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {sortedTransactions.map(transaction => (
-                  <TableRow key={transaction.id} className="animate-fade-in">
-                    <TableCell>{formatDate(transaction.date)}</TableCell>
-                    <TableCell>{transaction.description}</TableCell>
-                    <TableCell>{transaction.category}</TableCell>
-                    <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        transaction.type === 'income' 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
-                      }`}>
-                        {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <span className={transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
-                        {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toFixed(2)}
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end space-x-2">
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => setEditingTransaction(transaction)}
-                        >
-                          <Pencil className="h-4 w-4" />
-                          <span className="sr-only">Edit</span>
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="icon"
-                          onClick={() => handleDeleteTransaction(transaction.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                          <span className="sr-only">Delete</span>
-                        </Button>
-                      </div>
+                {isLoading ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="text-center py-8">
+                      Loading transactions...
                     </TableCell>
                   </TableRow>
-                ))}
-                {sortedTransactions.length === 0 && (
+                ) : sortedTransactions.length > 0 ? (
+                  sortedTransactions.map(transaction => (
+                    <TableRow key={transaction.id} className="animate-fade-in">
+                      <TableCell>{formatDate(transaction.date)}</TableCell>
+                      <TableCell>{transaction.description}</TableCell>
+                      <TableCell>{transaction.category}</TableCell>
+                      <TableCell>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          transaction.type === 'income' 
+                            ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
+                            : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
+                        }`}>
+                          {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <span className={transaction.type === 'income' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+                          {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end space-x-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => setEditingTransaction(transaction)}
+                          >
+                            <Pencil className="h-4 w-4" />
+                            <span className="sr-only">Edit</span>
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            onClick={() => handleDeleteTransaction(transaction.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                            <span className="sr-only">Delete</span>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                       {searchTerm ? 'No transactions found matching your search.' : 'No transactions yet. Add your first transaction using the button above.'}
@@ -280,6 +389,18 @@ const TransactionList: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
+      
+      {/* Fixed Add Transaction Button for Mobile */}
+      <div className="fixed bottom-4 right-4 sm:hidden z-50">
+        <Button 
+          size="lg" 
+          onClick={() => setShowAddTransaction(true)}
+          className="rounded-full shadow-lg flex items-center justify-center h-14 w-14"
+        >
+          <IndianRupee className="h-6 w-6" />
+          <span className="sr-only">Add Transaction</span>
+        </Button>
+      </div>
     </div>
   );
 };
