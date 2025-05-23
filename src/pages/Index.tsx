@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from '@/components/ThemeToggle';
-import { Key, Wallet, LogIn, User } from 'lucide-react';
+import { Wallet, Users, LogIn, Lock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -31,6 +31,11 @@ const Index = () => {
         <header className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-bold">KeyCoin</h2>
           <div className="flex items-center gap-3">
+            <Link to="/password">
+              <Button variant="ghost" size="icon" className="rounded-full" title="Password Manager">
+                <Lock className="h-4 w-4" />
+              </Button>
+            </Link>
             {isLoggedIn ? (
               <div className="flex items-center gap-3">
                 <Link to="/profile" className="flex items-center gap-2 hover:bg-secondary/50 px-3 py-1.5 rounded-full transition-all">
@@ -54,60 +59,60 @@ const Index = () => {
         <div className="text-center mb-16 animate-fade-in">
           <h1 className="text-5xl font-bold mb-4">KeyCoin</h1>
           <p className="text-xl text-muted-foreground">
-            Your vault for passwords and personal finances
+            Secure everything that matters — passwords, finances & bills
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Password Manager Card */}
+        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          {/* Finance Tracker Card */}
           <Card className="glass glass-hover transition-all duration-300 hover:scale-105 hover:shadow-xl animate-fade-in">
             <CardHeader>
               <div className="flex items-center justify-center mb-4">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <Key size={36} className="text-primary" />
+                <div className="p-4 rounded-full bg-primary/10">
+                  <Wallet size={48} className="text-primary" />
                 </div>
               </div>
-              <CardTitle className="text-2xl text-center">Password Manager</CardTitle>
+              <CardTitle className="text-2xl text-center">💰 Finance Tracker</CardTitle>
               <CardDescription className="text-center">
-                Generate and store passwords securely in your local vault.
+                Track your income, expenses, and budgets — all securely stored.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
               <p className="mb-6 text-muted-foreground">
-                Create strong passwords, evaluate their strength, and keep them in an encrypted vault on your device.
+                Monitor your spending, track financial goals, and visualize your money flow with interactive charts and insights.
               </p>
             </CardContent>
             <CardFooter className="flex justify-center">
-              <Link to="/password">
+              <Link to="/finance" className="w-full">
                 <Button size="lg" className="w-full transition-all hover:shadow-neon">
-                  Open Password Manager
+                  Open Finance Tracker
                 </Button>
               </Link>
             </CardFooter>
           </Card>
 
-          {/* Finance Tracker Card */}
+          {/* Bill Splitter Card */}
           <Card className="glass glass-hover transition-all duration-300 hover:scale-105 hover:shadow-xl animate-fade-in" style={{animationDelay: '100ms'}}>
             <CardHeader>
               <div className="flex items-center justify-center mb-4">
-                <div className="p-3 rounded-full bg-primary/10">
-                  <Wallet size={36} className="text-primary" />
+                <div className="p-4 rounded-full bg-primary/10">
+                  <Users size={48} className="text-primary" />
                 </div>
               </div>
-              <CardTitle className="text-2xl text-center">Finance Tracker</CardTitle>
+              <CardTitle className="text-2xl text-center">🤝 Bill Splitter</CardTitle>
               <CardDescription className="text-center">
-                Track your income, expenses, and budgets — all locally.
+                Split bills and expenses easily with friends, family, and roommates.
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
               <p className="mb-6 text-muted-foreground">
-                Monitor your spending, track financial goals, and visualize your money flow with interactive charts.
+                Create groups, track shared expenses, and calculate who owes what with smart splitting algorithms.
               </p>
             </CardContent>
             <CardFooter className="flex justify-center">
-              <Link to="/finance">
+              <Link to="/billsplitter" className="w-full">
                 <Button size="lg" className="w-full transition-all hover:shadow-neon">
-                  Open Finance Tracker
+                  Open Bill Splitter
                 </Button>
               </Link>
             </CardFooter>
@@ -115,7 +120,7 @@ const Index = () => {
         </div>
 
         <footer className="mt-16 text-center text-sm text-muted-foreground animate-fade-in" style={{animationDelay: '200ms'}}>
-          <p>All data is stored {isLoggedIn ? 'in your encrypted Supabase account' : 'locally on your device and never sent to any server'}.</p>
+          <p>All data is stored {isLoggedIn ? 'in your encrypted Supabase account' : 'securely and never sent to any server without your permission'}.</p>
         </footer>
       </div>
     </div>

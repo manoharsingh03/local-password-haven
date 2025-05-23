@@ -1,14 +1,14 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import AppContainer from '@/components/AppContainer';
-import ThemeToggle from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LogOut, Home } from "lucide-react";
+import { LogOut, Home, Lock } from "lucide-react";
+import ThemeToggle from '@/components/ThemeToggle';
+import BillSplitterContainer from '@/components/billsplitter/BillSplitterContainer';
 
-const PasswordManager = () => {
+const BillSplitter = () => {
   const { user, signOut } = useAuth();
   
   const userDisplayName = user?.user_metadata?.full_name || user?.email || 'User';
@@ -28,6 +28,11 @@ const PasswordManager = () => {
             </Link>
           </div>
           <div className="flex items-center gap-3">
+            <Link to="/password">
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Lock className="h-4 w-4" />
+              </Button>
+            </Link>
             {user && (
               <>
                 <Link to="/profile" className="flex items-center gap-2 hover:bg-secondary/50 px-3 py-1.5 rounded-full transition-all">
@@ -50,10 +55,10 @@ const PasswordManager = () => {
             <ThemeToggle />
           </div>
         </header>
-        <AppContainer />
+        <BillSplitterContainer />
       </div>
     </div>
   );
 };
 
-export default PasswordManager;
+export default BillSplitter;

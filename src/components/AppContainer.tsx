@@ -1,9 +1,7 @@
 
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LayoutGrid, Copy, BarChart3, Home, User } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { LayoutGrid, Copy } from "lucide-react";
 import PasswordGenerator from "./PasswordGenerator";
 import PasswordVault from "./PasswordVault";
 import ProfileCard from "./ProfileCard";
@@ -19,22 +17,6 @@ const AppContainer: React.FC = () => {
         <h1 className="text-4xl font-bold mb-2">Password Manager</h1>
         <p className="text-muted-foreground">Generate, evaluate, and securely store your passwords</p>
       </header>
-
-      <div className="flex justify-between mb-4">
-        <Link to="/">
-          <Button variant="ghost" size="sm" className="flex items-center transition-all hover:bg-primary/10">
-            <Home className="mr-2 h-4 w-4" />
-            Home
-          </Button>
-        </Link>
-        
-        <Link to="/finance">
-          <Button variant="outline" size="sm" className="flex items-center hover:shadow-md transition-all animate-pulse-slow">
-            <BarChart3 className="mr-2 h-4 w-4" />
-            Finance Tracker
-          </Button>
-        </Link>
-      </div>
 
       {isLoggedIn && (
         <div className="mb-6">
@@ -71,7 +53,7 @@ const AppContainer: React.FC = () => {
       </Tabs>
 
       <footer className="mt-10 text-center text-sm text-muted-foreground">
-        <p>Your passwords {isLoggedIn ? 'are' : 'never leave this device. All data is encrypted and stored locally'}.</p>
+        <p>Your passwords {isLoggedIn ? 'are securely encrypted and stored' : 'never leave this device. All data is encrypted and stored locally'}.</p>
       </footer>
     </div>
   );

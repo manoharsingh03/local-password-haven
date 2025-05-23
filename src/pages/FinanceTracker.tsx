@@ -1,12 +1,12 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import FinanceContainer from '@/components/finance/FinanceContainer';
-import ThemeToggle from '@/components/ThemeToggle';
 import { useAuth } from '@/context/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Home, Lock } from "lucide-react";
+import ThemeToggle from '@/components/ThemeToggle';
+import FinanceContainer from '@/components/finance/FinanceContainer';
 
 const FinanceTracker = () => {
   const { user, signOut } = useAuth();
@@ -18,8 +18,21 @@ const FinanceTracker = () => {
     <div className="min-h-screen bg-gradient-to-br from-background to-muted">
       <div className="container mx-auto px-4 py-4">
         <header className="flex items-center justify-between mb-6">
-          <Link to="/" className="text-2xl font-bold">KeyCoin</Link>
+          <div className="flex items-center gap-4">
+            <Link to="/" className="text-2xl font-bold">KeyCoin</Link>
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="flex items-center">
+                <Home className="mr-2 h-4 w-4" />
+                Home
+              </Button>
+            </Link>
+          </div>
           <div className="flex items-center gap-3">
+            <Link to="/password">
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <Lock className="h-4 w-4" />
+              </Button>
+            </Link>
             {user && (
               <>
                 <Link to="/profile" className="flex items-center gap-2 hover:bg-secondary/50 px-3 py-1.5 rounded-full transition-all">
