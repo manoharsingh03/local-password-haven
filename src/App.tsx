@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import FinanceTracker from "./pages/FinanceTracker";
 import PasswordManager from "./pages/PasswordManager";
 import BillSplitter from "./pages/BillSplitter";
+import GroupDetail from "./pages/GroupDetail";
 import Login from "./pages/Login";
 import AuthCallback from "./pages/AuthCallback";
 import UserProfile from "./pages/UserProfile";
@@ -34,7 +35,7 @@ const AppRoutes = () => (
     <Route path="/finance" element={<FinanceTracker />} />
     <Route path="/password" element={<PasswordManager />} />
     <Route path="/billsplitter" element={<BillSplitter />} />
-    <Route path="/billsplitter/group/:groupId" element={<ProtectedRoute><div>Group Detail Page (Coming Soon)</div></ProtectedRoute>} />
+    <Route path="/billsplitter/group/:groupId" element={<ProtectedRoute><GroupDetail /></ProtectedRoute>} />
     <Route path="/login" element={<Login />} />
     <Route path="/profile" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
     <Route path="/auth/callback" element={<AuthCallback />} />
