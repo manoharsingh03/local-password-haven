@@ -1,128 +1,150 @@
 
 import React, { useState } from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useAuth } from '@/context/AuthContext';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "@/components/ui/use-toast";
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
+import { Mail, User } from 'lucide-react';
 
 interface AddParticipantDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   groupId: string;
+  onSuccess?: () => void;
 }
 
-const AddParticipantDialog: React.FC<AddParticipantDialogProps> = ({
-  open,
+const AddParticipantDialog: React.FC<AddParticipantDialogProps> = ({ 
+  open, 
   onOpenChange,
-  groupId
+  groupId,
+  onSuccess
 }) => {
+  const { user } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const queryClient = useQueryClient();
-
-  const createParticipantMutation = useMutation({
-    mutationFn: async (data: { name: string; email?: string }) => {
-      const { data: participant, error } = await supabase
-        .from('participants')
-        .insert({
-          group_id: groupId,
-          name: data.name,
-          email: data.email || null
-        })
-        .select()
-        .single();
-
-      if (error) throw error;
-      return participant;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['participants', groupId] });
-      toast({
-        title: "Success",
-        description: "Participant added successfully!"
-      });
-      resetForm();
-      onOpenChange(false);
-    },
-    onError: (error) => {
-      console.error('Error creating participant:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add participant. Please try again.",
-        variant: "destructive"
-      });
-    }
-  });
-
-  const resetForm = () => {
-    setName('');
-    setEmail('');
-  };
-
-  const handleSubmit = () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!name.trim()) {
       toast({
-        title: "Error",
-        description: "Please enter a participant name.",
-        variant: "destructive"
+        title: "Name is required",
+        description: "Please enter a name for the participant.",
+        variant: "destructive",
       });
       return;
     }
 
-    createParticipantMutation.mutate({
-      name: name.trim(),
-      email: email.trim() || undefined
-    });
+    setIsSubmitting(true);
+    
+    try {
+      // Check if the email belongs to the current user
+      const isCurrentUser = user && email && user.email?.toLowerCase() === email.toLowerCase();
+      
+      const { data, error } = await supabase
+        .from('participants')
+        .insert({
+          group_id: groupId,
+          name: name.trim(),
+          email: email.trim() || null,
+          user_email: isCurrentUser ? user.email : null
+        })
+        .select('*')
+        .single();
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: `${name} has been added to the group.`,
+      });
+      
+      setName('');
+      setEmail('');
+      onOpenChange(false);
+      
+      if (onSuccess) {
+        onSuccess();
+      }
+    } catch (error) {
+      console.error('Error adding participant:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add participant. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add New Participant</DialogTitle>
-          <DialogDescription>
-            Add a new person to this group to split expenses with.
-          </DialogDescription>
+          <DialogTitle>Add Participant</DialogTitle>
         </DialogHeader>
-
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="name">Name *</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter participant's name"
-            />
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter name"
+                className="pl-10"
+                autoFocus
+                disabled={isSubmitting}
+              />
+            </div>
           </div>
-
-          <div>
-            <Label htmlFor="email">Email (Optional)</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email address"
-            />
+          
+          <div className="space-y-2">
+            <Label htmlFor="email">Email (optional)</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter email"
+                className="pl-10"
+                disabled={isSubmitting}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Adding email helps with identifying participants and enabling Finance Tracker integration
+            </p>
           </div>
-
-          <div className="flex justify-end space-x-3">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+          
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
-            <Button 
-              onClick={handleSubmit}
-              disabled={createParticipantMutation.isPending}
-            >
-              {createParticipantMutation.isPending ? 'Adding...' : 'Add Participant'}
+            <Button type="submit" disabled={isSubmitting || !name.trim()}>
+              {isSubmitting ? "Adding..." : "Add Participant"}
             </Button>
           </div>
-        </div>
+          
+          {user && (
+            <p className="text-sm text-muted-foreground">
+              Tip: If you add your own email ({user.email}), the app will recognize you in this group.
+            </p>
+          )}
+        </form>
       </DialogContent>
     </Dialog>
   );

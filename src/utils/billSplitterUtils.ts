@@ -79,10 +79,10 @@ export const calculateSettlements = (balances: Balance[]): Settlement[] => {
     debtor.balance += amount;
     creditor.balance -= amount;
 
-    if (debtor.balance === 0) {
+    if (Math.abs(debtor.balance) < 0.01) {
       debtors.shift();
     }
-    if (creditor.balance === 0) {
+    if (Math.abs(creditor.balance) < 0.01) {
       creditors.shift();
     }
   }
@@ -114,4 +114,24 @@ export const formatCurrencyINR = (amount: number): string => {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(amount);
+};
+
+/**
+ * Find participant by email
+ */
+export const findParticipantByEmail = (participants: Array<{id: string, email: string | null}>, email: string): string | null => {
+  if (!email) return null;
+  
+  const participant = participants.find(p => 
+    p.email && p.email.toLowerCase() === email.toLowerCase()
+  );
+  
+  return participant ? participant.id : null;
+};
+
+/**
+ * Normalize email (trim and lowercase)
+ */
+export const normalizeEmail = (email: string): string => {
+  return email ? email.trim().toLowerCase() : '';
 };

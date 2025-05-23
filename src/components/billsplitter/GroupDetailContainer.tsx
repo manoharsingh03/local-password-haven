@@ -12,6 +12,7 @@ import ParticipantsList from './ParticipantsList';
 import BalancesDashboard from './BalancesDashboard';
 import AddExpenseDialog from './AddExpenseDialog';
 import AddParticipantDialog from './AddParticipantDialog';
+import FinanceIntegrationSettings from './FinanceIntegrationSettings';
 
 interface GroupDetailContainerProps {
   groupId: string;
@@ -38,7 +39,7 @@ const GroupDetailContainer: React.FC<GroupDetailContainerProps> = ({ groupId }) 
     enabled: !!groupId,
   });
 
-  const { data: participants, isLoading: participantsLoading } = useQuery({
+  const { data: participants, isLoading: participantsLoading, refetch: refetchParticipants } = useQuery({
     queryKey: ['participants', groupId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -53,7 +54,7 @@ const GroupDetailContainer: React.FC<GroupDetailContainerProps> = ({ groupId }) 
     enabled: !!groupId,
   });
 
-  const { data: expenses, isLoading: expensesLoading } = useQuery({
+  const { data: expenses, isLoading: expensesLoading, refetch: refetchExpenses } = useQuery({
     queryKey: ['expenses', groupId],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -74,6 +75,28 @@ const GroupDetailContainer: React.FC<GroupDetailContainerProps> = ({ groupId }) 
     },
     enabled: !!groupId,
   });
+
+  const { data: settlements, refetch: refetchSettlements } = useQuery({
+    queryKey: ['settlements', groupId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('settlements')
+        .select('*')
+        .eq('group_id', groupId)
+        .order('settled_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!groupId,
+  });
+
+  const handleSettlementAdded = () => {
+    // Refetch data after settlement is added
+    refetchSettlements();
+    // We might also want to refetch expenses in case our backend has updated them
+    refetchExpenses();
+  };
 
   if (groupLoading) {
     return (
@@ -155,6 +178,12 @@ const GroupDetailContainer: React.FC<GroupDetailContainerProps> = ({ groupId }) 
         </Card>
       </div>
 
+      {user && (
+        <div className="mb-8">
+          <FinanceIntegrationSettings groupId={groupId} groupName={group.name} />
+        </div>
+      )}
+
       <div className="flex gap-4 mb-6">
         <Button 
           onClick={() => setShowAddExpense(true)}
@@ -193,6 +222,9 @@ const GroupDetailContainer: React.FC<GroupDetailContainerProps> = ({ groupId }) 
             participants={participants || []}
             expenses={expenses || []}
             isLoading={participantsLoading || expensesLoading}
+            groupId={groupId}
+            groupName={group.name}
+            onSettlementAdded={handleSettlementAdded}
           />
         </TabsContent>
 
@@ -215,6 +247,7 @@ const GroupDetailContainer: React.FC<GroupDetailContainerProps> = ({ groupId }) 
         open={showAddParticipant}
         onOpenChange={setShowAddParticipant}
         groupId={groupId}
+        onSuccess={() => refetchParticipants()}
       />
     </div>
   );

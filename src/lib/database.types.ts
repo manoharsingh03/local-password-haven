@@ -98,6 +98,7 @@ export type Database = {
           group_id: string;
           name: string;
           email: string | null;
+          user_email: string | null;
           created_at: string;
         };
         Insert: {
@@ -105,6 +106,7 @@ export type Database = {
           group_id: string;
           name: string;
           email?: string | null;
+          user_email?: string | null;
           created_at?: string;
         };
         Update: {
@@ -112,6 +114,7 @@ export type Database = {
           group_id?: string;
           name?: string;
           email?: string | null;
+          user_email?: string | null;
           created_at?: string;
         };
       };
@@ -122,7 +125,9 @@ export type Database = {
           title: string;
           amount: number;
           paid_by: string;
+          paid_by_email: string | null;
           split_type: string;
+          finance_sync_enabled: boolean | null;
           created_at: string;
           updated_at: string;
         };
@@ -132,7 +137,9 @@ export type Database = {
           title: string;
           amount: number;
           paid_by: string;
+          paid_by_email?: string | null;
           split_type?: string;
+          finance_sync_enabled?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -142,7 +149,9 @@ export type Database = {
           title?: string;
           amount?: number;
           paid_by?: string;
+          paid_by_email?: string | null;
           split_type?: string;
+          finance_sync_enabled?: boolean | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -170,6 +179,65 @@ export type Database = {
           created_at?: string;
         };
       };
+      settlements: {
+        Row: {
+          id: string;
+          group_id: string;
+          from_participant_id: string;
+          to_participant_id: string;
+          amount: number;
+          description: string | null;
+          settled_at: string | null;
+          finance_synced: boolean | null;
+          created_by: string | null;
+        };
+        Insert: {
+          id?: string;
+          group_id: string;
+          from_participant_id: string;
+          to_participant_id: string;
+          amount: number;
+          description?: string | null;
+          settled_at?: string | null;
+          finance_synced?: boolean | null;
+          created_by?: string | null;
+        };
+        Update: {
+          id?: string;
+          group_id?: string;
+          from_participant_id?: string;
+          to_participant_id?: string;
+          amount?: number;
+          description?: string | null;
+          settled_at?: string | null;
+          finance_synced?: boolean | null;
+          created_by?: string | null;
+        };
+      };
+      finance_integrations: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          group_id: string | null;
+          enabled: boolean | null;
+          created_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id?: string | null;
+          group_id?: string | null;
+          enabled?: boolean | null;
+          created_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          group_id?: string | null;
+          enabled?: boolean | null;
+          created_at?: string | null;
+        };
+      };
     };
   };
 };
+
