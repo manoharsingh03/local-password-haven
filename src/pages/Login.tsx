@@ -66,8 +66,12 @@ const Login = () => {
     setIsLoading(true);
     try {
       const { data, error } = await signIn(values.email, values.password);
-      if (!error && data) {
-        navigate("/");
+      if (!error && data.user) {
+        if (data.user.email_confirmed_at) {
+          navigate("/");
+        } else {
+          console.log("Email not confirmed yet");
+        }
       }
     } catch (error) {
       console.error("Login failed:", error);
@@ -81,8 +85,10 @@ const Login = () => {
     setIsLoading(true);
     try {
       const { data, error } = await signUp(values.email, values.password);
-      if (!error && data) {
-        setActiveTab("login");
+      if (!error && data.user) {
+        // Reset form and potentially switch to login tab
+        signupForm.reset();
+        // Don't automatically switch to login, let user see the success message
       }
     } catch (error) {
       console.error("Signup failed:", error);
@@ -112,13 +118,13 @@ const Login = () => {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-4xl font-bold mb-2 animate-fade-in">KeyCoin</h1>
-          <p className="text-muted-foreground animate-fade-in" style={{animationDelay: '100ms'}}>Your vault for passwords and personal finances</p>
+          <p className="text-muted-foreground animate-fade-in" style={{animationDelay: '100ms'}}>Secure Password Manager</p>
         </div>
         
         <Card className="glass glass-hover animate-fade-in" style={{animationDelay: '200ms'}}>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl">Welcome</CardTitle>
-            <CardDescription>Access your vault securely</CardDescription>
+            <CardDescription>Access your secure password vault</CardDescription>
           </CardHeader>
           
           <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">

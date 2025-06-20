@@ -36,6 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      console.log('Auth state changed:', _event, newSession ? 'Session exists' : 'No session');
       setSession(newSession);
       setUser(newSession?.user || null);
       setLoading(false);
@@ -50,6 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           console.error('Error fetching session:', error);
         }
         
+        console.log('Initial session:', initialSession ? 'Session exists' : 'No session');
         setSession(initialSession);
         setUser(initialSession?.user || null);
       } catch (error) {
@@ -128,7 +130,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Sign up with email and password
+  // Sign up with email and password - FIXED email confirmation
   const signUp = async (email: string, password: string) => {
     try {
       const response = await supabase.auth.signUp({ 
@@ -145,15 +147,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           description: response.error.message,
           variant: "destructive"
         });
-      } else {
-        toast({
-          title: "Signup successful",
-          description: "Please check your email for verification instructions."
-        });
+      } else if (response.data.user) {
+        if (response.data.user.email_confirmed_at) {
+          toast({
+            title: "Account created successfully",
+            description: "You can now log in to your account."
+          });
+        } else {
+          toast({
+            title: "Check your email",
+            description: "We've sent you a confirmation link to complete your registration."
+          });
+        }
       }
       return response;
     } catch (error) {
       console.error('Sign up error:', error);
+      const authError = error as AuthError;
+      toast({
+        title: "Signup error",
+        description: authError.message || "An unexpected error occurred",
+        variant: "destructive"
+      });
       throw error;
     }
   };
