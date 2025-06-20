@@ -74,11 +74,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await supabase.auth.signInWithPassword({ email, password });
       if (response.error) {
-        toast({
-          title: "Login failed",
-          description: response.error.message,
-          variant: "destructive"
-        });
+        // Handle specific error cases
+        if (response.error.message.includes('Email not confirmed')) {
+          toast({
+            title: "Email not confirmed",
+            description: "Please check your email and click the confirmation link before logging in.",
+            variant: "destructive"
+          });
+        } else if (response.error.message.includes('Invalid login credentials')) {
+          toast({
+            title: "Invalid credentials",
+            description: "Please check your email and password and try again.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Login failed",
+            description: response.error.message,
+            variant: "destructive"
+          });
+        }
       } else if (response.data.user) {
         toast({
           title: "Login successful",
@@ -142,21 +157,32 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       
       if (response.error) {
-        toast({
-          title: "Signup failed",
-          description: response.error.message,
-          variant: "destructive"
-        });
+        // Handle specific signup errors
+        if (response.error.message.includes('User already registered')) {
+          toast({
+            title: "Account already exists",
+            description: "An account with this email already exists. Please try logging in instead.",
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Signup failed",
+            description: response.error.message,
+            variant: "destructive"
+          });
+        }
       } else if (response.data.user) {
         if (response.data.user.email_confirmed_at) {
+          // User is automatically confirmed (email confirmation disabled)
           toast({
             title: "Account created successfully",
             description: "You can now log in to your account."
           });
         } else {
+          // User needs to confirm email
           toast({
             title: "Check your email",
-            description: "We've sent you a confirmation link to complete your registration."
+            description: "We've sent you a confirmation link. Please check your email and click the link to complete your registration."
           });
         }
       }

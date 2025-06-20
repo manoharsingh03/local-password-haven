@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -67,10 +66,11 @@ const Login = () => {
     try {
       const { data, error } = await signIn(values.email, values.password);
       if (!error && data.user) {
-        if (data.user.email_confirmed_at) {
+        // Only navigate if user is confirmed or confirmation is disabled
+        if (data.user.email_confirmed_at || !data.user.confirmation_sent_at) {
           navigate("/");
         } else {
-          console.log("Email not confirmed yet");
+          console.log("Email not confirmed yet - user needs to check email");
         }
       }
     } catch (error) {
@@ -86,9 +86,14 @@ const Login = () => {
     try {
       const { data, error } = await signUp(values.email, values.password);
       if (!error && data.user) {
-        // Reset form and potentially switch to login tab
+        // Reset form after successful signup
         signupForm.reset();
-        // Don't automatically switch to login, let user see the success message
+        
+        // If email confirmation is disabled, automatically switch to login
+        if (data.user.email_confirmed_at) {
+          setActiveTab("login");
+        }
+        // If email confirmation is enabled, keep them on signup tab to see the message
       }
     } catch (error) {
       console.error("Signup failed:", error);
